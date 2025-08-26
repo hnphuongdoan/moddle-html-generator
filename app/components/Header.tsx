@@ -3,70 +3,92 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { IoMenu } from "react-icons/io5";
+import { useTheme } from "next-themes";
+import { Menu, X } from "lucide-react";
 
 export default function Header() {
+  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
-  const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Apply theme to <html>
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
+    setMounted(true);
+  }, []);
+
+  const navItems = [
+    { href: "/", label: "Homepage" },
+    { href: "/tabs", label: "Tabs" },
+    { href: "/pre-lab-questions", label: "Pre-lab Questions" },
+    { href: "/escape-room", label: "Escape Room" },
+    { href: "/coding-races", label: "Coding Races" },
+    { href: "/about", label: "About" },
+  ];
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  if (!mounted) return null;
 
   return (
-    <header className="w-full border-b border-gray-300 dark:border-gray-600">
-      {/* Top Header Row */}
-      <div className="flex justify-between items-center px-4 py-2 bg-white dark:bg-[#0d1117] text-black dark:text-white">
-        <div className="font-semibold text-sm">
-          Student Number: <span className="font-bold">21210670</span>
+    <header className="bg-white dark:bg-black shadow-md">
+      <div className="flex items-center justify-between px-4 py-2">
+        <div className="text-lg font-semibold text-black dark:text-white">
+          Student Number: 21210670
         </div>
 
         <div className="flex items-center gap-4">
-          <Link href="/about" className="text-sm hover:underline">
-            About
-          </Link>
+          {/* Toggle switch with label */}
+          <div className="flex items-center">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={theme === "dark"}
+                onChange={toggleTheme}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+            <span className="ml-2 text-sm text-black dark:text-white">
+              {theme === "dark" ? "Dark Mode" : "Light Mode"}
+            </span>
+          </div>
 
-          {/* Theme toggle */}
-          <div className="flex items-center gap-2">
-  <span className="text-sm">{isDark ? "Light Mode" : "Dark Mode"}</span>
-  <button
-    onClick={() => setIsDark(!isDark)}
-    className="relative w-10 h-6 bg-gray-300 dark:bg-gray-700 rounded-full transition-colors duration-300"
-  >
-    <div
-      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${
-        isDark ? "translate-x-4" : "translate-x-0"
-      }`}
-    />
-  </button>
-</div>
-
-          {/* Optional Hamburger Button */}
+          {/* Hamburger Icon */}
           <button
-            onClick={() => setMenuOpen(true)}
-            className="md:hidden p-2 focus:outline-none"
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-black dark:text-white focus:outline-none"
           >
-            <IoMenu size={20} />
+            {menuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
       </div>
 
-      {/* Sub Navigation Bar */}
-     <div className={`w-full border-t border-b py-2 px-4 ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-100 text-black'}`}>
-  <nav className="flex gap-6 justify-center text-sm font-medium">
-    <Link href="/" className="hover:underline">Home</Link>
-    <Link href="/tabs" className="hover:underline">Tabs</Link>
-    <Link href="/pre-lab-questions" className="hover:underline">Pre-lab Questions</Link>
-    <Link href="/escape-room" className="hover:underline">Escape Room</Link>
-    <Link href="/coding-races" className="hover:underline">Coding Races</Link>
-  </nav>
-</div>
+      {/* Nav bar below student number */}
+      <nav
+        className={`transition-all duration-300 overflow-hidden ${
+          menuOpen ? "max-h-screen" : "max-h-0"
+        } bg-gray-100 dark:bg-gray-900`}
+      >
+        <ul className="flex flex-col md:flex-row md:justify-center md:items-center p-4 gap-2 text-sm font-medium">
+          {navItems.map(({ href, label }) => (
+            <li key={href}>
+              <Link
+                href={href}
+                className={`block px-3 py-2 rounded ${
+                  pathname === href
+                    ? "bg-blue-500 text-white"
+                    : "text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
   );
 }

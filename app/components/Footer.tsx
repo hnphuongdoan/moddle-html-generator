@@ -1,30 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-
-const Footer = () => {
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString('en-AU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-
+export default function Footer() {
   return (
-    <footer
-      style={{
-        padding: '1rem',
-        marginTop: '2rem',
-        textAlign: 'center',
-        fontSize: '0.9rem',
-        borderTop: '1px solid #ccc',
-      }}
-    >
-      <p>
-        &copy; {formattedDate} – Nguyen Phuong Doan Ho (21210670)
-      </p>
+    <footer className="w-full mt-16 py-4 border-t border-gray-300 dark:border-gray-700 text-center text-sm text-gray-600 dark:text-gray-400">
+      <p>© 2025 Moodle HTML Generator | Created by 21210670</p>
     </footer>
   );
-};
-
-export default Footer;
+}
