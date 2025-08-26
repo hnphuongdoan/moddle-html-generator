@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { IoMenu } from "react-icons/io5";
 
+// Note: This component was initially developed with assistance from ChatGPT to implement the Header layout, theme toggle, and hamburger menu. Manual adjustments and styling were made to meet assignment and accessibility requirements
+
 export default function Header() {
   const pathname = usePathname();
   const [isDark, setIsDark] = useState(false);
