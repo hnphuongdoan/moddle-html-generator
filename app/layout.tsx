@@ -1,25 +1,31 @@
-import './globals.css';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import type { Metadata } from 'next';
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Moodle HTML Generator',
-  description: 'Student: Nguyen Phuong Doan Ho - 21210670',
-};
+import './globals.css'
+import { ThemeProvider } from 'next-themes'
+import Header from './components/Header'
+import Footer from './components/Footer'
+import { useEffect, useState } from 'react'
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
-    <html lang="en">
-      <body className="bg-white text-black dark:bg-zinc-900 dark:text-white">
-        <Header />
-        {children}
-        <Footer />
+    <html lang="en" suppressHydrationWarning>
+      <body className="transition-colors duration-300 bg-white text-black dark:bg-[#0d1117] dark:text-white">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {mounted && (
+            <>
+              <Header />
+              <main className="min-h-screen px-4 pt-24">{children}</main>
+              <Footer />
+            </>
+          )}
+        </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
