@@ -55,4 +55,4 @@ This application allows educators and developers to quickly generate HTML5 compo
 npm install
 
 # Start dev server
-npm run dev
+npm run dev// Trigger redeploy
