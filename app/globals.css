@@ -5,38 +5,55 @@
   --foreground: #171717;
 }
 
-@theme inline {
+@theme inline{ 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --front-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root{
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+body { 
+  background: var(--background); 
+  color: var(--foreground); 
+  font-family: Arial, Helvetica, sans-serif; 
 }
 
-:root {
-  --bg-color: #ffffff;
-  --text-color: #000000;
+:root { 
+  --bg-color: #ffffff; 
+  --text-color: #000000; 
 }
 
-.dark {
-  --bg-color: #111827;
-  --text-color: #f9fafb;
+.dark { 
+  --bg-color: #111827; 
+  --text-color: #f9fafb; 
 }
 
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
+body { 
+  background-color: var(--bg-color); 
+  color: var(--text-color); transition: 
+  background-color 0.3s ease, color 0.3s ease; 
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-bounce {
+  animation: bounceIn 0.8s ease-out;
 }
