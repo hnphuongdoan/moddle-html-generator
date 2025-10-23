@@ -1,42 +1,39 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function VictoryScreen() {
+export default function VictoryPage() {
   const router = useRouter();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      router.push('/escape-room'); 
-    }, 10000); 
-
-    return () => clearTimeout(timeout);
-  }, [router]);
+    const timer = setTimeout(() => setShowConfetti(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center text-white text-center px-4"
-      style={{
-        backgroundImage: 'url("/background_Victory.jpg")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      <div className="bg-black bg-opacity-70 p-10 rounded-xl shadow-2xl max-w-2xl w-full">
-        <h1 className="text-5xl font-bold text-green-400 mb-4">🎉 Yayyyyy!</h1>
-        <p className="text-xl text-white mb-4">
-          Congrats! You've won. You may now escape — the ship is heading back to Earth 😂
-        </p>
-        <p className="text-yellow-300">Redirecting to main screen in 10 seconds...</p>
+    <main className="flex flex-col items-center justify-center min-h-screen px-4 py-10 bg-gradient-to-br from-purple-700 via-indigo-800 to-black text-white text-center relative">
+      <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+        🎉 Congrats! You&apos;ve won.
+      </h1>
 
-        <button
-          onClick={() => router.push('/escape-room')}
-          className="mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          🔁 Play Again
-        </button>
-      </div>
-    </div>
+      <p className="text-lg sm:text-xl mb-6 max-w-xl">
+        You may now escape — the ship is heading back to Earth 😂
+      </p>
+
+      <button
+        onClick={() => router.push('/')}
+        className="mt-6 px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition"
+      >
+        Return Home
+      </button>
+
+      {showConfetti && (
+        <div className="absolute inset-0 pointer-events-none animate-pulse-slow">
+          <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-pink-500/10 via-purple-500/20 to-transparent blur-xl" />
+        </div>
+      )}
+    </main>
   );
 }

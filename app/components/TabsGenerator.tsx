@@ -29,13 +29,13 @@ export default function TabsGenerator() {
 
   const generateOutput = () => {
     const headers = tabs.map(
-      (tab, idx) =>
+      (tab) =>
         `<button onclick="openTab(event, 'tab${tab.id}')" style="padding:5px;border:1px solid black;margin-right:5px;background:white;">${tab.title}</button>`
     ).join("\n");
 
     const contents = tabs.map(
-      (tab, idx) =>
-        `<div id="tab${tab.id}" style="display:${idx === 0 ? "block" : "none"};padding:10px;border:1px solid black;">${tab.content}</div>`
+      (tab, _idx) => 
+        `<div id="tab${tab.id}" style="display:${tab.id === tabs[0].id ? "block" : "none"};padding:10px;border:1px solid black;">${tab.content}</div>`
     ).join("\n");
 
     return `

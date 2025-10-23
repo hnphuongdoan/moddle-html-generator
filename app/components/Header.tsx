@@ -1,16 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { IoMenu } from "react-icons/io5";
 
 // Note: This component was initially developed with assistance from ChatGPT to implement the Header layout, theme toggle, and hamburger menu. Manual adjustments and styling were made to meet assignment and accessibility requirements
 
 export default function Header() {
-  const pathname = usePathname();
   const [isDark, setIsDark] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   // Apply theme to <html>
   useEffect(() => {
@@ -49,13 +45,7 @@ export default function Header() {
   </button>
 </div>
 
-          {/* Optional Hamburger Button */}
-          <button
-            onClick={() => setMenuOpen(true)}
-            className="md:hidden p-2 focus:outline-none"
-          >
-            <IoMenu size={20} />
-          </button>
+         
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Stage1Props {
@@ -9,15 +9,36 @@ interface Stage1Props {
 export default function Stage1({ onNext }: Stage1Props) {
   const router = useRouter();
   const [code, setCode] = useState('function hello(){\n  console.log("Hi")\n}');
-  const [message, setMessage] = useState('');
   const [timeLeft, setTimeLeft] = useState(60);
   const [tries, setTries] = useState(0);
-  const [showTimeoutMsg, setShowTimeoutMsg] = useState(false);
   const [showPopup, setShowPopup] = useState<string | null>(null);
 
   const correctCode = `function hello() {\n  console.log("Hi");\n}`;
 
-  // countdown timer
+  const handleFail = useCallback(
+    async (isTimeout: boolean) => {
+      // 🔸 Sending failure information to API
+      await fetch('/api/attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerId: 'guest',
+          stage: 1,
+          attemptNo: tries + 1,
+          success: false,
+        }),
+      });
+
+      if (isTimeout) {
+        setShowPopup('⏰ Time’s up! You lost the challenge...');
+      } else {
+        setShowPopup('💀 You lost the challenge... now you’re stuck on this ship forever.');
+      }
+      setTimeout(() => router.push('/failure'), 2000);
+    },
+    [router, tries]
+  );
+
   useEffect(() => {
     if (timeLeft <= 0) {
       handleFail(true);
@@ -25,16 +46,39 @@ export default function Stage1({ onNext }: Stage1Props) {
     }
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, handleFail]);
 
-  // main check
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (code.trim() === correctCode.trim()) {
+      // 🔸 Send winning results to API
+      await fetch('/api/result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerName: 'guest',
+          stage: 1,
+          score: 100,
+          result: true,
+        }),
+      });
+
       setShowPopup('🎉 Victory!!!');
       setTimeout(() => onNext(), 1500);
     } else {
       const newTries = tries + 1;
       setTries(newTries);
+
+      // 🔸 Sending wrong attempt to API
+      await fetch('/api/attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerId: 'guest',
+          stage: 1,
+          attemptNo: newTries,
+          success: false,
+        }),
+      });
 
       if (newTries === 1) {
         setShowPopup('🔧 Debug harder. The universe depends on it.');
@@ -48,17 +92,6 @@ export default function Stage1({ onNext }: Stage1Props) {
     }
   };
 
-  // fail logic (timeout or 3 wrong)
-  const handleFail = (isTimeout: boolean) => {
-    setShowTimeoutMsg(false);
-    if (isTimeout) {
-      setShowPopup('⏰ Time’s up! You lost the challenge...');
-    } else {
-      setShowPopup('💀 You lost the challenge... now you’re stuck on this ship forever.');
-    }
-    setTimeout(() => router.push('/failure'), 2000);
-  };
-
   return (
     <div
       className="min-h-screen bg-cover bg-center flex items-center justify-start pl-63 pr-4"
@@ -70,7 +103,7 @@ export default function Stage1({ onNext }: Stage1Props) {
         <p className="text-yellow-400 font-semibold mb-4">Time remaining: {timeLeft}s</p>
 
         <h2 className="text-xl font-semibold text-purple-300 mb-2">
-          Stage 1: Format the Code
+          Stage 1: Format the Code
         </h2>
         <p className="mb-2 text-sm text-gray-200">
           Fix the code below so it has proper indentation:
@@ -90,7 +123,6 @@ export default function Stage1({ onNext }: Stage1Props) {
           Submit
         </button>
 
-        {/* Center popup */}
         {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-black/80 text-white text-2xl font-semibold px-8 py-6 rounded-xl shadow-2xl text-center animate-bounce">

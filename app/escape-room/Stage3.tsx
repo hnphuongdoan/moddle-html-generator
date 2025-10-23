@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Stage3Props {
-  onNext: () => void;
+  onNext: () => void; // ✅ kept for future extensibility if needed
 }
 
 interface Question {
@@ -19,50 +19,52 @@ const questionPool: Question[] = [
     question: 'Which of these is a JavaScript framework?',
     options: ['Laravel', 'Django', 'React', 'Flask'],
     correct: 'React',
-    hint: 'Think Facebook 😉'
+    hint: 'Think Facebook 😉',
   },
   {
     question: 'What keyword declares a variable in JS?',
     options: ['def', 'function', 'const', 'echo'],
     correct: 'const',
-    hint: "Used when you don't want re-assignment"
+    hint: "Used when you don't want re-assignment",
   },
   {
     question: 'Which symbol is used for comments in JS?',
     options: ['//', '<!--', '#', '/*'],
     correct: '//',
-    hint: 'Double slashes win the race'
+    hint: 'Double slashes win the race',
   },
   {
     question: 'What does NaN mean?',
     options: ['Not a Name', 'No Assigned Number', 'Not a Number', 'Next Available Node'],
     correct: 'Not a Number',
-    hint: "It's what JS says when math breaks 😅"
+    hint: "It's what JS says when math breaks 😅",
   },
   {
     question: 'Which of these is NOT a JavaScript data type?',
     options: ['Boolean', 'Undefined', 'Float', 'Symbol'],
     correct: 'Float',
-    hint: 'Surprise! JavaScript handles all numbers the same.'
+    hint: 'Surprise! JavaScript handles all numbers the same.',
   },
   {
     question: 'What method is used to parse JSON in JS?',
     options: ['JSON.read()', 'JSON.parse()', 'JSON.load()', 'JSON.convert()'],
     correct: 'JSON.parse()',
-    hint: 'Used to read strings and turn them into JS objects'
-  }
+    hint: 'Used to read strings and turn them into JS objects',
+  },
 ];
 
 const failQuotes = [
   '🛸 ERROR 404: Your logic has left the spaceship.',
-  "⚠️ That wasn’t it... maybe next time don’t guess like a space monkey. 🐒",
-  '💀 You lost the challenge... now you\'re stuck on this ship forever.'
+  '⚠️ That wasn’t it... maybe next time don’t guess like a space monkey. 🐒',
+  '💀 You lost the challenge... now you&apos;re stuck on this ship forever.',
 ];
 
 export default function Stage3({ onNext }: Stage3Props) {
+  const router = useRouter();
+
   const [currentQIndex, setCurrentQIndex] = useState(0);
-  const [selected, setSelected] = useState<string>('');
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+  const [selected, setSelected] = useState('');
   const [message, setMessage] = useState('');
   const [attempts, setAttempts] = useState(0);
   const [showHint, setShowHint] = useState(false);
@@ -70,12 +72,28 @@ export default function Stage3({ onNext }: Stage3Props) {
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameOver, setGameOver] = useState(false);
 
-  const router = useRouter();
-
   useEffect(() => {
-    const shuffled = questionPool.sort(() => 0.5 - Math.random()).slice(0, 2);
+    const shuffled = [...questionPool].sort(() => 0.5 - Math.random()).slice(0, 2);
     setShuffledQuestions(shuffled);
   }, []);
+
+  const handleFail = useCallback(
+    (isTimeout: boolean) => {
+      const nextAttempt = attempts + 1;
+      setAttempts(nextAttempt);
+      setSelected('');
+      setHintUsed(false);
+      setShowHint(false);
+      setMessage(isTimeout ? 'timeout' : 'incorrect');
+      setTimeLeft(60);
+
+      if (nextAttempt >= 3) {
+        setGameOver(true);
+        setTimeout(() => router.push('/failure'), 2000);
+      }
+    },
+    [attempts, router]
+  );
 
   useEffect(() => {
     if (gameOver) return;
@@ -85,22 +103,7 @@ export default function Stage3({ onNext }: Stage3Props) {
     }
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
-  }, [timeLeft, gameOver]);
-
-  const handleFail = (isTimeout: boolean) => {
-    const nextAttempt = attempts + 1;
-    setAttempts(nextAttempt);
-    setSelected('');
-    setHintUsed(false);
-    setShowHint(false);
-    setMessage(isTimeout ? 'timeout' : 'incorrect');
-    setTimeLeft(60);
-
-    if (nextAttempt >= 3) {
-      setGameOver(true);
-      setTimeout(() => router.push('/failure'), 2000);
-    }
-  };
+  }, [timeLeft, gameOver, handleFail]);
 
   const handleSubmit = () => {
     if (gameOver || message === 'correct') return;
