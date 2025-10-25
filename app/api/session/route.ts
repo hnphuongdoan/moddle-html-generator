@@ -1,21 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { prisma } from '../lib/prisma';
+import { logEvent } from '@/app/lib/logger';
 
-const mockSessions = [
-  { id: "1", stage: "Stage 1", description: "Introduction stage" },
-  { id: "2", stage: "Stage 2", description: "Logic puzzle stage" },
-  { id: "3", stage: "Stage 3", description: "Final escape challenge" },
-];
-
+// ✅ GET all sessions
 export async function GET() {
-  return NextResponse.json({ sessions: mockSessions });
+  const sessions = await prisma.session.findMany();
+  return NextResponse.json(sessions);
 }
 
+// ✅ POST a new session (with instrumentation)
 export async function POST(req: Request) {
-  const body = await req.json();
-  if (!body.stage || !body.description) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-  }
+  const data = await req.json();
 
-  const newSession = { id: String(Date.now()), ...body };
-  return NextResponse.json({ message: "Session created", session: newSession });
+  // Add instrumentation log
+  logEvent("New session created", data);
+
+  const newSession = await prisma.session.create({
+    data: {
+      name: data.name,
+      stage: data.stage,
+      description: data.description,
+      questions: data.questions,
+    },
+  });
+
+  return NextResponse.json(newSession);
 }

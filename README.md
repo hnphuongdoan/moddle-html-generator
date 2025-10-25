@@ -56,3 +56,9 @@ npm install
 
 # Start dev server
 npm run dev// Trigger redeploy
+
+## 🐳 Docker & Prisma Setup
+
+### Build the Image
+```bash
+docker build -t moodle-html-generator .

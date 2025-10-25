@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  name        String
+  stage       String
+  description String
+  questions   Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Hint {
+  id        String   @id @default(cuid())
+  stage     Int      @unique
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attempt {
+  id        String   @id @default(cuid())
+  stage     String
+  success   Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
