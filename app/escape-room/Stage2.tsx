@@ -43,13 +43,20 @@ export default function Stage2({ onNext }: Stage2Props) {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
+  const normalize = (str: string) =>
+  str
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .join('\n');
+  
   const handleSubmit = () => {
-    if (code.replace(/\s+/g, '') === challenge.answer.replace(/\s+/g, '')) {
-      setMessage('correct');
-    } else {
-      handleFail(false);
-    }
-  };
+  if (normalize(code) === normalize(challenge.answer)) {
+    setMessage('correct');
+  } else {
+    handleFail(false);
+  }
+};
 
   const handleFail = (isTimeout: boolean) => {
     const newTries = tries + 1;
